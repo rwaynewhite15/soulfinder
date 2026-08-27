@@ -130,13 +130,19 @@ export default function TimeSeries({ series, years, labels, width, height }: Pro
         ri, yPos: y(last[String(ri)]), text: labels[ri], v: last[String(ri)],
       }));
       out.sort((a, b) => a.yPos - b.yPos);
-      // nudge apart so end labels never overlap
+      // Nudge apart so end labels never overlap, then push back up from the
+      // bottom: nudging alone walks the last labels off the plot when several
+      // near-zero series converge on the axis.
       for (let i = 1; i < out.length; i++) {
         if (out[i].yPos - out[i - 1].yPos < 12) out[i].yPos = out[i - 1].yPos + 12;
       }
+      for (let i = out.length - 1; i > 0; i--) {
+        if (out[i].yPos > ih) out[i].yPos = ih;
+        if (out[i].yPos - out[i - 1].yPos < 12) out[i - 1].yPos = out[i].yPos - 12;
+      }
     }
     return out;
-  }, [rows, stacked, shownIdx, labels, y, chartMode]);
+  }, [rows, stacked, shownIdx, labels, y, chartMode, ih]);
 
   return (
     <svg

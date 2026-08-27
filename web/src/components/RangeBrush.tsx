@@ -112,32 +112,41 @@ export default function RangeBrush({
           x={x(win[0])} y={0} width={Math.max(1, x(win[1]) - x(win[0]))} height={ih}
           className="brush-window"
           onPointerDown={(e) => {
-            (e.target as Element).setPointerCapture?.(e.pointerId);
+            (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
             setGrabOffset(yearAt(e.clientX) - win[0]);
             setDrag("move");
           }}
         />
 
         {(["lo", "hi"] as const).map((side) => (
-          <g key={side} transform={`translate(${x(side === "lo" ? win[0] : win[1])},0)`}>
+          // The handler sits on the group, not on the invisible hit rect: the
+          // visible line and grip are painted on top of that rect and would
+          // otherwise swallow the pointerdown, leaving the handle ungrabbable.
+          <g
+            key={side}
+            transform={`translate(${x(side === "lo" ? win[0] : win[1])},0)`}
+            style={{ cursor: "ew-resize" }}
+            onPointerDown={(e) => {
+              (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+              setDrag(side);
+            }}
+          >
             {/* generous invisible hit target; the visible handle stays thin */}
-            <rect x={-7} y={0} width={14} height={ih} fill="transparent"
-              style={{ cursor: "ew-resize" }}
-              onPointerDown={(e) => {
-                (e.target as Element).setPointerCapture?.(e.pointerId);
-                setDrag(side);
-              }} />
+            <rect x={-7} y={0} width={14} height={ih} fill="transparent" />
             <line y2={ih} className="brush-handle" />
             <rect x={-3} y={ih / 2 - 9} width={6} height={18} rx={2} className="brush-grip" />
           </g>
         ))}
 
-        <g transform={`translate(${x(year)},0)`} style={{ cursor: "grab" }}>
-          <rect x={-8} y={-M.top} width={16} height={height} fill="transparent"
-            onPointerDown={(e) => {
-              (e.target as Element).setPointerCapture?.(e.pointerId);
-              setDrag("year");
-            }} />
+        <g
+          transform={`translate(${x(year)},0)`}
+          style={{ cursor: "grab" }}
+          onPointerDown={(e) => {
+            (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+            setDrag("year");
+          }}
+        >
+          <rect x={-8} y={-M.top} width={16} height={height} fill="transparent" />
           <line y1={-M.top} y2={ih} className="brush-playhead" />
           <circle cy={-M.top + 3} r={3.5} className="brush-playhead-dot" />
         </g>
