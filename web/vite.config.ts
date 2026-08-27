@@ -1,7 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+/**
+ * Normalise a Pages base path into the form Vite wants: leading and trailing
+ * slash, or a bare "/".
+ *
+ * `actions/configure-pages` reports `/soulfinder` for a project site and `/`
+ * for a user site, and a custom domain changes it again — so the value is
+ * normalised here rather than assumed in the workflow. Getting this wrong is
+ * the classic Pages failure: the page loads, every asset 404s, and the app
+ * renders blank with no obvious cause.
+ */
+function normalizeBase(raw: string | undefined): string {
+  const trimmed = (raw ?? "").replace(/^\/+|\/+$/g, "");
+  return trimmed ? `/${trimmed}/` : "/";
+}
+
+export default defineConfig(({ command }) => ({
+  // Only the production build is served from a subpath; the dev server always
+  // runs at the root so `npm run dev` needs no special URL.
+  base: command === "build" ? normalizeBase(process.env.BASE_PATH) : "/",
   plugins: [react()],
   server: { port: 5173 },
   build: {
@@ -15,4 +33,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

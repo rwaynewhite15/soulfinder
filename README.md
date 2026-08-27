@@ -164,6 +164,37 @@ Only 53 countries carry data in this build. The rest render grey and say so.
 
 ---
 
+## Deployment
+
+Pushing to `main` builds and publishes the site to GitHub Pages via
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Pull requests
+run the same build and tests but never deploy.
+
+**One manual step before the first deploy:** in the repository, go to
+**Settings → Pages → Build and deployment → Source** and select
+**GitHub Actions**. Until that is set, the deploy job fails with a permissions
+error — the workflow cannot enable Pages for you.
+
+The workflow rebuilds the data from source on every run, because the artifacts
+are gitignored:
+
+```
+npm run geo                    # TopoJSON -> GeoJSON + admin-1 centroids
+python -m pytest               # 64 tests — a red suite blocks the deploy
+python -m soulfinder.build     # interpolate, benchmark, synthesise, validate
+npm run build                  # typecheck + bundle
+```
+
+Geometry has to run first: it writes the centroid tables that both the tests
+and the pipeline read. The upside of not committing the artifacts is that the
+published site can never disagree with the pipeline that produced it — and a
+modelling regression fails CI rather than shipping.
+
+The base path comes from `actions/configure-pages`, so the build works
+unchanged for a project site (`/soulfinder/`), a user site (`/`), a custom
+domain, or a fork under a different name. `vite.config.ts` normalises whatever
+it reports; local `npm run dev` is unaffected and still serves at the root.
+
 ## Docs
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — stack choices and why, the
