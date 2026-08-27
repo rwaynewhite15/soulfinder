@@ -1,19 +1,23 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import GlobeMap from "./components/GlobeMap";
+import FaithAtlas from "./components/FaithAtlas";
 import TimeSeries from "./components/TimeSeries";
 import RangeBrush from "./components/RangeBrush";
 import Controls from "./components/Controls";
 import RegionPanel from "./components/RegionPanel";
 import DataTable from "./components/DataTable";
+import TrendRail from "./components/TrendRail";
 import Legend from "./components/Legend";
 import { loadAll } from "./lib/data";
 import { colorDomain } from "./lib/domain";
 import { yearIndex } from "./lib/data";
 import { useStore } from "./state/store";
+import { sequentialRamp } from "./lib/oklch";
+import { categorical } from "./lib/palette";
 
 export default function App() {
   const { data, error, setData, setError, selected, dark, showTable, religion,
-          changeBasis, baseYear, window: win } = useStore();
+          changeBasis, baseYear, window: win, view, chartView } = useStore();
   const chartRef = useRef<HTMLDivElement>(null);
   const [chartWidth, setChartWidth] = useState(900);
 
@@ -97,13 +101,20 @@ export default function App() {
 
       <main className="stage">
         <section className="map-pane">
-          <GlobeMap data={data} />
-          <Legend
-            label={labels[religion]}
-            maxShare={legendDomain.maxShare}
-            maxDelta={legendDomain.maxDelta}
-          />
-          <div className="map-hint">Scroll to zoom · click a country to drill in</div>
+          {view === "atlas" ? (
+            <FaithAtlas data={data} />
+          ) : (
+            <>
+              <GlobeMap data={data} />
+              <Legend
+                label={labels[religion]}
+                maxShare={legendDomain.maxShare}
+                maxDelta={legendDomain.maxDelta}
+                ramp={sequentialRamp(categorical(dark)[religion], 13, dark)}
+              />
+              <div className="map-hint">Scroll to zoom · click a country to drill in</div>
+            </>
+          )}
         </section>
         <RegionPanel data={data} />
       </main>
@@ -113,23 +124,43 @@ export default function App() {
           <h2>
             {series.name}
             <span className="chart-sub">
-              {useStore.getState().chartMode === "stack"
-                ? "composition over time"
-                : "share over time"} · {win[0]}–{win[1]}
+              {chartView === "trends"
+                ? "what is changing"
+                : useStore.getState().chartMode === "stack"
+                  ? "composition over time"
+                  : "share over time"} · {win[0]}–{win[1]}
             </span>
           </h2>
+          <div className="seg" role="group" aria-label="Lower pane view">
+            <button
+              className={`seg-btn ${chartView === "series" ? "on" : ""}`}
+              onClick={() => useStore.getState().set("chartView", "series")}
+            >Over time</button>
+            <button
+              className={`seg-btn ${chartView === "trends" ? "on" : ""}`}
+              onClick={() => useStore.getState().set("chartView", "trends")}
+            >Trends</button>
+          </div>
         </div>
-        {showTable ? (
-          <DataTable series={series} years={data.bundle.years} labels={labels} />
-        ) : (
-          <TimeSeries
-            series={series}
-            years={data.bundle.years}
-            labels={labels}
-            width={chartWidth}
-            height={260}
-          />
-        )}
+        {/* The body scrolls; the brush stays pinned below it. The trends rail
+            is taller than the chart, and without this it pushed the range
+            brush off-screen -- the control that decides the very window the
+            rail is summarising. */}
+        <div className="chart-body">
+          {chartView === "trends" ? (
+            <TrendRail series={series} years={data.bundle.years} labels={labels} />
+          ) : showTable ? (
+            <DataTable series={series} years={data.bundle.years} labels={labels} />
+          ) : (
+            <TimeSeries
+              series={series}
+              years={data.bundle.years}
+              labels={labels}
+              width={chartWidth}
+              height={260}
+            />
+          )}
+        </div>
         <RangeBrush series={series} years={data.bundle.years} width={chartWidth} />
       </section>
     </div>

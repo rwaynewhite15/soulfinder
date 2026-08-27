@@ -13,6 +13,10 @@
  * chroma, CVD separation and normal-vision floors on adjacent pairs. Three
  * light-mode slots sit below 3:1 on the light surface, so the relief rule
  * applies -- the chart ships direct labels and a table view.
+ *
+ * Sequential ramps are not listed here: each religion gets its own, generated
+ * from its categorical hue in `oklch.ts`, so the map, the heat layer and the
+ * legend all wear the colour that religion already has in the chart.
  */
 export const CATEGORICAL_LIGHT = [
   "#2a78d6", "#eb6834", "#1baf7a", "#eda100",
@@ -22,13 +26,6 @@ export const CATEGORICAL_LIGHT = [
 export const CATEGORICAL_DARK = [
   "#3987e5", "#d95926", "#199e70", "#c98500",
   "#d55181", "#008300", "#9085e9", "#e66767",
-];
-
-/** Single-hue blue ramp, light -> dark. Sequential magnitude only. */
-export const SEQUENTIAL = [
-  "#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec",
-  "#5598e7", "#3987e5", "#2a78d6", "#256abf", "#1c5cab",
-  "#184f95", "#104281", "#0d366b",
 ];
 
 /** Diverging blue <-> red with a neutral gray midpoint. Never a hue at the middle. */
@@ -50,12 +47,6 @@ export function hexToRgb(hex: string): [number, number, number] {
 
 export function categorical(dark: boolean): string[] {
   return dark ? CATEGORICAL_DARK : CATEGORICAL_LIGHT;
-}
-
-/** Sample the sequential ramp at t in [0,1]. */
-export function sequentialAt(t: number): string {
-  const i = Math.round(Math.max(0, Math.min(1, t)) * (SEQUENTIAL.length - 1));
-  return SEQUENTIAL[i];
 }
 
 /**

@@ -4,7 +4,8 @@ import { _GlobeView as GlobeView, MapView, type PickingInfo } from "@deck.gl/cor
 import { GeoJsonLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import { useStore } from "../state/store";
-import { divergingAt, hexToRgb, sequentialAt } from "../lib/palette";
+import { categorical, divergingAt, hexToRgb } from "../lib/palette";
+import { rampAt, sequentialRamp } from "../lib/oklch";
 import { change, peopleOf, shareOf, yearIndex } from "../lib/data";
 import { colorDomain } from "../lib/domain";
 import { pct, people, pp, signedPeople } from "../lib/format";
@@ -91,6 +92,26 @@ export default function GlobeMap({ data }: Props) {
     [data, showStates, religion, years.length, changeBasis, bi]
   );
 
+  /**
+   * One ramp per religion, built from that religion's own categorical hue.
+   *
+   * Selecting Hindu turns the whole map gold; selecting Muslim turns it orange.
+   * Identity comes from the hue, magnitude from lightness within it, and the
+   * choropleth, the heat layer, the legend, the chip and the chart band all
+   * agree on what colour a religion is -- without ever putting two categorical
+   * hues next to each other on a map, which is the thing that cannot be made
+   * colour-safe.
+   */
+  const ramp = useMemo(
+    () => sequentialRamp(categorical(dark)[religion], 13, dark),
+    [religion, dark]
+  );
+  const heatRange = useMemo(
+    () => sequentialRamp(categorical(dark)[religion], 6, dark)
+      .map((h) => hexToRgb(h) as [number, number, number]),
+    [religion, dark]
+  );
+
   const seriesForFeature = useCallback(
     (props: Record<string, unknown>): RegionSeries | undefined =>
       showStates
@@ -104,12 +125,12 @@ export default function GlobeMap({ data }: Props) {
       if (!s) return dark ? [42, 42, 40, 140] : [225, 224, 219, 160];
       if (mapMetric === "share") {
         const t = shareOf(s, yi, religion) / domain.maxShare;
-        return [...hexToRgb(sequentialAt(t)), 232];
+        return [...hexToRgb(rampAt(ramp, t)), 232];
       }
       const d = change(s, bi, yi, religion, changeBasis);
       return [...hexToRgb(divergingAt(d / domain.maxDelta, dark)), 232];
     },
-    [mapMetric, yi, bi, religion, changeBasis, domain, dark]
+    [mapMetric, yi, bi, religion, changeBasis, domain, dark, ramp]
   );
 
   const layers = useMemo(() => {
@@ -142,7 +163,7 @@ export default function GlobeMap({ data }: Props) {
         getLineWidth: 1,
         lineWidthUnits: "pixels",
         updateTriggers: {
-          getFillColor: [yi, bi, religion, mapMetric, changeBasis, dark, showStates],
+          getFillColor: [yi, bi, religion, mapMetric, changeBasis, dark, showStates, ramp],
         },
         onClick: (info: PickingInfo) => {
           const p = (info.object as { properties?: Record<string, unknown> })?.properties;
@@ -179,11 +200,14 @@ export default function GlobeMap({ data }: Props) {
             radiusPixels: showStates ? 34 : 26,
             intensity: 1.1,
             threshold: 0.04,
-            colorRange: [
-              [205, 226, 251], [158, 197, 244], [109, 167, 236],
-              [42, 120, 214], [24, 79, 149], [13, 54, 107],
-            ],
-            updateTriggers: { getWeight: [yi, religion, showStates] },
+            // The heat ramp wears the selected religion's own hue rather than a
+            // fixed blue, so switching religions reads as switching subject and
+            // the heat layer agrees with the chip, the chart and the atlas.
+            colorRange: heatRange,
+            updateTriggers: {
+              getWeight: [yi, religion, showStates],
+              colorRange: [religion, dark],
+            },
           })
         );
       } else {
@@ -227,7 +251,7 @@ export default function GlobeMap({ data }: Props) {
     return ls;
   }, [
     data, showStates, showDensity, mapMetric, changeBasis, religion, yi, bi,
-    dark, domain, fillFor, seriesForFeature, select, hover,
+    dark, domain, fillFor, seriesForFeature, select, hover, heatRange,
   ]);
 
   const getTooltip = useCallback(

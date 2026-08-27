@@ -257,7 +257,13 @@ body {
 .hint { font-size: 11.5px; color: var(--text-muted); margin-top: 12px; }
 
 /* ---------- chart ---------- */
-.chart-pane { background: var(--surface-1); padding: 10px 16px 12px; }
+.chart-pane {
+  background: var(--surface-1); padding: 10px 16px 12px;
+  display: flex; flex-direction: column; min-height: 0;
+  /* cap the lower pane so a tall trends rail cannot starve the map */
+  max-height: 46vh;
+}
+.chart-body { flex: 1; min-height: 0; overflow-y: auto; }
 .chart-head { display: flex; align-items: baseline; justify-content: space-between; }
 .chart-head h2 {
   margin: 0 0 2px; font-size: 13px; font-weight: 600;
@@ -298,8 +304,8 @@ body {
 .brush-playhead-dot { fill: var(--accent); }
 
 /* ---------- table ---------- */
-/* tall enough for all eight categories without an inner scrollbar */
-.table-wrap { overflow-x: auto; max-height: 316px; overflow-y: auto; }
+/* the pane body already scrolls; the table just needs horizontal overflow */
+.table-wrap { overflow-x: auto; }
 .data-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 .data-table caption {
   text-align: left; color: var(--text-secondary); font-size: 11.5px; padding-bottom: 6px;
@@ -348,3 +354,105 @@ body {
 }
 
 .select.region { max-width: 190px; }
+
+/* ---------- segmented control ---------- */
+.seg {
+  display: inline-flex; border: 1px solid var(--border-strong);
+  border-radius: 7px; overflow: hidden; background: var(--surface-1);
+}
+.seg-btn {
+  border: 0; background: none; color: var(--text-secondary);
+  padding: 5px 11px; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+}
+.seg-btn + .seg-btn { border-left: 1px solid var(--border); }
+.seg-btn:hover { color: var(--text-primary); }
+.seg-btn.on { background: var(--accent); color: #fff; font-weight: 600; }
+
+/* ---------- faith atlas ---------- */
+.atlas {
+  position: absolute; inset: 0; background: var(--surface-1);
+  display: flex; flex-direction: column;
+}
+/* the note gets its own strip: overlaying it on the grid covered two facets */
+.atlas-stage { position: relative; flex: 1; min-height: 0; }
+/* This grid is an overlay sitting on top of the WebGL canvas, so it and its
+   cells must stay transparent -- a background here paints over the globes.
+   Separators are inset shadows on each facet, which also survive the column
+   count changing between wide and narrow layouts. */
+.atlas-grid {
+  position: absolute; inset: 0;
+  display: grid; pointer-events: none;
+}
+.facet {
+  position: relative; border: 0; background: none; padding: 7px 9px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  align-items: flex-start; text-align: left; color: inherit;
+  cursor: pointer; pointer-events: auto;
+  box-shadow: inset -1px 0 0 var(--border), inset 0 -1px 0 var(--border);
+}
+/* grid gaps do the separating; explicit nth-child rules would be wrong the
+   moment the column count changes */
+.facet:hover { background: color-mix(in srgb, var(--surface-1) 22%, transparent); }
+.facet.active {
+  box-shadow: inset -1px 0 0 var(--border), inset 0 -1px 0 var(--border),
+              inset 0 0 0 2px var(--accent);
+}
+.facet-head {
+  display: flex; align-items: center; gap: 6px;
+  background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  padding: 2px 7px; border-radius: 999px;
+}
+.facet-name { font-size: 12px; font-weight: 600; letter-spacing: -.01em; }
+.facet-stats {
+  display: flex; flex-direction: column; gap: 3px;
+  background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  padding: 3px 7px; border-radius: 7px;
+}
+.facet-world {
+  font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.facet-scale { display: flex; align-items: center; gap: 6px; }
+.facet-ramp { display: flex; width: 54px; height: 6px; border-radius: 2px; overflow: hidden; }
+.facet-ramp span { flex: 1; }
+.facet-max { font-size: 10px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.atlas-note {
+  margin: 0; padding: 6px 12px; font-size: 11.5px; color: var(--text-secondary);
+  border-top: 1px solid var(--border); background: var(--surface-2);
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.atlas-caveat { color: var(--text-muted); }
+
+/* ---------- trend rail ---------- */
+.rail { padding-top: 2px; }
+.rail-head, .rail-row {
+  display: grid;
+  grid-template-columns: 168px 132px 72px 72px 78px 118px 84px;
+  align-items: center; gap: 12px;
+}
+.rail-head {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--text-muted); font-weight: 600;
+  padding: 0 6px 5px; border-bottom: 1px solid var(--border);
+}
+.rail-head .num, .rail-col.num { text-align: right; }
+.rail-col-spark { text-align: center; }
+.rail-row {
+  width: 100%; border: 0; background: none; color: inherit; text-align: left;
+  padding: 1px 6px; border-radius: 7px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.rail-row:hover { background: var(--surface-2); }
+.rail-row.active { background: var(--accent-soft); }
+.rail-name {
+  display: flex; align-items: center; gap: 7px; font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.spark { display: block; }
+.rail-col { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.rail-sub { display: block; font-size: 10px; line-height: 1.25; }
+.rail-note { font-size: 11px; color: var(--text-muted); margin: 8px 6px 0; max-width: 96ch; }
+
+@media (max-width: 1200px) {
+  .rail-head, .rail-row { grid-template-columns: 150px 110px 64px 64px 70px 96px 74px; gap: 8px; }
+}

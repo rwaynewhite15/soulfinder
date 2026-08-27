@@ -73,6 +73,18 @@ The map switches its geometry and its colour domain when the selection enters a
 country with subnational data, and the globe flattens to a map at zoom 2.5,
 where curvature stops helping and starts distorting.
 
+There are two stage views and two lower-pane views, and they compose freely:
+
+| | Globe | All faiths (atlas) |
+|---|---|---|
+| **Over time** | one religion, drillable to state, with the scrubbable stacked chart | eight globes on one shared camera + the chart |
+| **Trends** | one religion + the per-religion trend rail | eight globes + the trend rail |
+
+The eight atlas facets share a single camera, so dragging any one of them turns
+all eight. That is the interaction that makes the comparison land — you rotate
+to Africa and watch the Christian and Muslim globes trade places along the
+Sahel.
+
 **The hierarchy reconciles exactly** — states sum to their country, countries
 sum to the world, to within JSON rounding. This is asserted in
 `test_build_consistency.py`, not assumed. It is easy to break: benchmarking one
@@ -90,13 +102,47 @@ frame. A domain recomputed each year would rescale the ramp as the slider
 moves, so a region holding perfectly steady would still change colour. Fixing
 the domain means every colour change on the map is a change in the data.
 
-**No categorical choropleth.** Colouring countries by "largest religion" would
-put all eight categorical hues in a single view where any pair can end up
-adjacent, and eight hues cannot clear colour-vision-deficiency separation
-floors under that condition. The map encodes one religion's magnitude on a
-single-hue sequential ramp, or change on a diverging ramp with a neutral grey
-midpoint. Categorical colour is used only in the chart, where the pairs that
-can touch are the adjacent ones — which the eight-slot order does clear.
+**No categorical choropleth — and the measurement that settled it.** The
+obvious way to show "different religions" on one map is to colour each country
+by its largest. That puts all eight categorical hues in a view where *any* pair
+can end up adjacent, so the palette has to clear separation floors on all 28
+pairs rather than the 7 adjacent ones a chart needs.
+
+It doesn't. Running the validator over every subset of the eight-hue order, in
+both themes:
+
+| Hues shown at once | Subsets clearing all-pairs floors, both themes |
+|---|---|
+| 8, 7, 6, 5 | **0** |
+| 4 | 2 (`blue, yellow, magenta, green` · `yellow, magenta, green, violet`) |
+
+Four is the ceiling, and neither passing set contains the hues already bound to
+Muslim (orange) or Unaffiliated (aqua). So a categorical map would have to
+*recolour religions* relative to the chart — a worse problem than the one it
+solves.
+
+The remedy is faceting, and it turns out to be the better product anyway: **the
+atlas view** gives each religion its own globe on its own **sequential** ramp,
+so no two categorical hues are ever adjacent on a map and all eight are
+visible. Identity survives because each facet's ramp is generated from that
+religion's own chart hue — the blue globe is the same Christian blue as the
+blue band in the chart. On the main globe the same idea applies: selecting
+Hindu turns the choropleth, the heat layer and the legend all gold.
+
+Generating those ramps needed real colour maths (`src/lib/oklch.ts`). Fading a
+hue toward white in sRGB does not produce monotone lightness, and naively
+clamping out-of-gamut RGB channels rotates the hue — measured drift was up to
+**30°** across a single ramp, turning a one-hue sequential scale into a small
+rainbow. Interpolating lightness in OKLab at fixed hue, and gamut-mapping by
+reducing *chroma* rather than clipping channels, brings all 16 ramps (8
+religions × 2 themes) to monotone lightness with hue held inside 2.6°.
+
+**Trends get their own view.** A stacked chart answers "what is this region
+made of"; it is genuinely bad at "what is changing". Band *thickness* is easy
+to read, band *slope* is not, and small categories are invisible — a religion
+going from 0.5% to 2% quadruples and stays a hairline. The trend rail puts
+every religion on its own baseline with a sparkline, sorted by how far it
+actually moved, with the magnitudes printed rather than left to the eye.
 
 **Change has two meanings, so the app offers both.** A group can grow by tens
 of millions of people while losing share to a faster-growing one. Utah's

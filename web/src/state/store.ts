@@ -4,6 +4,8 @@ import type { AppData } from "../lib/data";
 export type MapMetric = "share" | "change";
 export type ChangeBasis = "share" | "people";
 export type ChartMode = "stack" | "lines";
+export type View = "globe" | "atlas";
+export type ChartView = "series" | "trends";
 
 export interface AppState {
   data: AppData | null;
@@ -24,6 +26,11 @@ export interface AppState {
   /** Region whose series the chart shows: "WLD", an ISO3, or "USA-XX". */
   selected: string;
   hovered: string | null;
+
+  /** Main stage: the single interactive globe, or the faceted atlas. */
+  view: View;
+  /** Lower pane: the time series, or the per-religion trend rail. */
+  chartView: ChartView;
 
   mapMetric: MapMetric;
   changeBasis: ChangeBasis;
@@ -59,6 +66,8 @@ export const useStore = create<AppState>((set) => ({
   visible: Array(N_RELIGIONS).fill(true),
   selected: "WLD",
   hovered: null,
+  view: "globe",
+  chartView: "series",
   mapMetric: "share",
   changeBasis: "share",
   chartMode: "stack",

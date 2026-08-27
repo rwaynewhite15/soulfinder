@@ -43,6 +43,20 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
       </div>
 
       <div className="control-group">
+        <div className="seg" role="group" aria-label="Map view">
+          <button
+            className={`seg-btn ${s.view === "globe" ? "on" : ""}`}
+            onClick={() => s.set("view", "globe")}
+          >Globe</button>
+          <button
+            className={`seg-btn ${s.view === "atlas" ? "on" : ""}`}
+            onClick={() => s.set("view", "atlas")}
+            title="All eight religions side by side, one globe each"
+          >All faiths</button>
+        </div>
+      </div>
+
+      <div className="control-group">
         <label className="control-label" htmlFor="region">Region</label>
         <select
           id="region"
@@ -66,6 +80,7 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
         </select>
       </div>
 
+      {s.view === "globe" && (
       <div className="control-group">
         <label className="control-label" htmlFor="metric">Map shows</label>
         <select
@@ -78,8 +93,9 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
           <option value="change">Change since baseline</option>
         </select>
       </div>
+      )}
 
-      {s.mapMetric === "change" && (
+      {s.view === "globe" && s.mapMetric === "change" && (
         <div className="control-group">
           <label className="control-label" htmlFor="basis">Measured in</label>
           <select
