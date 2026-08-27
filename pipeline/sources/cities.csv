@@ -1,0 +1,184 @@
+# Real metropolitan-area coordinates and approximate metro populations.
+# These anchor the dasymetric density field: religious population is
+# redistributed within an admin unit toward where people actually live,
+# instead of being smeared uniformly across the polygon.
+# admin1_code is populated for US cities only (used for the state drill-down).
+name,iso3,admin1_code,lat,lon,population_millions
+Tokyo,JPN,,35.6762,139.6503,37.4
+Delhi,IND,,28.7041,77.1025,32.9
+Shanghai,CHN,,31.2304,121.4737,29.2
+Dhaka,BGD,,23.8103,90.4125,23.2
+Sao Paulo,BRA,,-23.5505,-46.6333,22.6
+Cairo,EGY,,30.0444,31.2357,22.1
+Mexico City,MEX,,19.4326,-99.1332,22.0
+Beijing,CHN,,39.9042,116.4074,21.8
+Mumbai,IND,,19.0760,72.8777,21.3
+Osaka,JPN,,34.6937,135.5023,19.0
+Karachi,PAK,,24.8607,67.0011,17.2
+Chongqing,CHN,,29.4316,106.9123,17.0
+Istanbul,TUR,,41.0082,28.9784,15.8
+Kinshasa,COD,,-4.4419,15.2663,15.6
+Buenos Aires,ARG,,-34.6037,-58.3816,15.4
+Lagos,NGA,,6.5244,3.3792,15.4
+Kolkata,IND,,22.5726,88.3639,15.3
+Manila,PHL,,14.5995,120.9842,14.4
+Tianjin,CHN,,39.3434,117.3616,14.0
+Guangzhou,CHN,,23.1291,113.2644,13.9
+Rio de Janeiro,BRA,,-22.9068,-43.1729,13.5
+Lahore,PAK,,31.5204,74.3587,13.5
+Bangalore,IND,,12.9716,77.5946,13.2
+Shenzhen,CHN,,22.5431,114.0579,12.8
+Moscow,RUS,,55.7558,37.6173,12.6
+Chennai,IND,,13.0827,80.2707,11.5
+Bogota,COL,,4.7110,-74.0721,11.3
+Paris,FRA,,48.8566,2.3522,11.2
+Jakarta,IDN,,-6.2088,106.8456,11.0
+Lima,PER,,-12.0464,-77.0428,11.0
+Bangkok,THA,,13.7563,100.5018,10.9
+Hyderabad,IND,,17.3850,78.4867,10.5
+Seoul,KOR,,37.5665,126.9780,10.0
+Nagoya,JPN,,35.1815,136.9066,9.6
+London,GBR,,51.5074,-0.1278,9.6
+Tehran,IRN,,35.6892,51.3890,9.5
+Chengdu,CHN,,30.5728,104.0668,9.5
+Ho Chi Minh City,VNM,,10.8231,106.6297,9.3
+Luanda,AGO,,-8.8390,13.2894,9.0
+Ahmedabad,IND,,23.0225,72.5714,8.6
+Kuala Lumpur,MYS,,3.1390,101.6869,8.6
+Wuhan,CHN,,30.5928,114.3055,8.4
+Hanoi,VNM,,21.0285,105.8542,8.1
+Xian,CHN,,34.3416,108.9398,8.0
+Riyadh,SAU,,24.7136,46.6753,7.7
+Hong Kong,CHN,,22.3193,114.1694,7.6
+Baghdad,IRQ,,33.3152,44.3661,7.5
+Dar es Salaam,TZA,,-6.7924,39.2083,7.4
+Pune,IND,,18.5204,73.8567,7.2
+Surat,IND,,21.1702,72.8311,7.0
+Santiago,CHL,,-33.4489,-70.6693,6.8
+Madrid,ESP,,40.4168,-3.7038,6.7
+Toronto,CAN,,43.6532,-79.3832,6.4
+Khartoum,SDN,,15.5007,32.5599,6.2
+Johannesburg,ZAF,,-26.2041,28.0473,6.0
+Ankara,TUR,,39.9334,32.8597,5.7
+Alexandria,EGY,,31.2001,29.9187,5.6
+Barcelona,ESP,,41.3851,2.1734,5.6
+Yangon,MMR,,16.8661,96.1951,5.4
+Nairobi,KEN,,-1.2864,36.8172,5.3
+Guadalajara,MEX,,20.6597,-103.3496,5.3
+Sydney,AUS,,-33.8688,151.2093,5.3
+Chittagong,BGD,,22.3569,91.7832,5.2
+Addis Ababa,ETH,,9.0320,38.7469,5.2
+Melbourne,AUS,,-37.8136,144.9631,5.1
+Cape Town,ZAF,,-33.9249,18.4241,4.6
+Kabul,AFG,,34.5553,69.2075,4.6
+Montreal,CAN,,45.5017,-73.5673,4.3
+Rome,ITA,,41.9028,12.4964,4.3
+Tel Aviv,ISR,,32.0853,34.7818,4.2
+Kano,NGA,,12.0022,8.5920,4.1
+Casablanca,MAR,,33.5731,-7.5898,3.8
+Kampala,UGA,,0.3476,32.5825,3.7
+Abuja,NGA,,9.0765,7.3986,3.6
+Ibadan,NGA,,7.3775,3.9470,3.6
+Berlin,DEU,,52.5200,13.4050,3.6
+Busan,KOR,,35.1796,129.0756,3.4
+Milan,ITA,,45.4642,9.1900,3.1
+Kyiv,UKR,,50.4501,30.5234,3.0
+Surabaya,IDN,,-7.2575,112.7521,3.0
+Algiers,DZA,,36.7538,3.0588,2.9
+Caracas,VEN,,10.4806,-66.9036,2.9
+Tashkent,UZB,,41.2995,69.2401,2.9
+Vancouver,CAN,,49.2827,-123.1207,2.6
+Accra,GHA,,5.6037,-0.1870,2.6
+Brisbane,AUS,,-27.4698,153.0251,2.6
+Bandung,IDN,,-6.9175,107.6191,2.5
+Colombo,LKA,,6.9271,79.8612,2.4
+Perth,AUS,,-31.9505,115.8605,2.1
+Warsaw,POL,,52.2297,21.0122,1.8
+Stockholm,SWE,,59.3293,18.0686,1.7
+Kathmandu,NPL,,27.7172,85.3240,1.5
+Jerusalem,ISR,,31.7683,35.2137,1.3
+Amsterdam,NLD,,52.3676,4.9041,1.2
+New York,USA,NY,40.7128,-74.0060,18.9
+Los Angeles,USA,CA,34.0522,-118.2437,12.5
+Chicago,USA,IL,41.8781,-87.6298,8.9
+Dallas,USA,TX,32.7767,-96.7970,6.4
+Houston,USA,TX,29.7604,-95.3698,6.1
+Miami,USA,FL,25.7617,-80.1918,6.1
+Atlanta,USA,GA,33.7490,-84.3880,5.8
+Philadelphia,USA,PA,39.9526,-75.1652,5.7
+Washington,USA,DC,38.9072,-77.0369,5.5
+Phoenix,USA,AZ,33.4484,-112.0740,4.7
+San Francisco,USA,CA,37.7749,-122.4194,4.7
+Riverside,USA,CA,33.9533,-117.3962,4.6
+Boston,USA,MA,42.3601,-71.0589,4.3
+Seattle,USA,WA,47.6062,-122.3321,4.0
+Detroit,USA,MI,42.3314,-83.0458,3.7
+Minneapolis,USA,MN,44.9778,-93.2650,3.6
+San Diego,USA,CA,32.7157,-117.1611,3.3
+Tampa,USA,FL,27.9506,-82.4572,3.2
+Denver,USA,CO,39.7392,-104.9903,2.9
+St Louis,USA,MO,38.6270,-90.1994,2.8
+Baltimore,USA,MD,39.2904,-76.6122,2.8
+Charlotte,USA,NC,35.2271,-80.8431,2.7
+Orlando,USA,FL,28.5383,-81.3792,2.7
+San Antonio,USA,TX,29.4241,-98.4936,2.6
+Portland,USA,OR,45.5152,-122.6784,2.5
+Sacramento,USA,CA,38.5816,-121.4944,2.4
+Newark,USA,NJ,40.7357,-74.1724,2.4
+Pittsburgh,USA,PA,40.4406,-79.9959,2.3
+Las Vegas,USA,NV,36.1699,-115.1398,2.3
+Austin,USA,TX,30.2672,-97.7431,2.3
+Cincinnati,USA,OH,39.1031,-84.5120,2.3
+Kansas City,USA,MO,39.0997,-94.5786,2.2
+Columbus,USA,OH,39.9612,-82.9988,2.1
+Cleveland,USA,OH,41.4993,-81.6944,2.1
+Indianapolis,USA,IN,39.7684,-86.1581,2.1
+San Jose,USA,CA,37.3382,-121.8863,2.0
+Nashville,USA,TN,36.1627,-86.7816,2.0
+Virginia Beach,USA,VA,36.8529,-75.9780,1.8
+Providence,USA,RI,41.8240,-71.4128,1.7
+Milwaukee,USA,WI,43.0389,-87.9065,1.6
+Jacksonville,USA,FL,30.3322,-81.6557,1.6
+Oklahoma City,USA,OK,35.4676,-97.5164,1.4
+Raleigh,USA,NC,35.7796,-78.6382,1.4
+Memphis,USA,TN,35.1495,-90.0490,1.3
+Richmond,USA,VA,37.5407,-77.4360,1.3
+Louisville,USA,KY,38.2527,-85.7585,1.3
+New Orleans,USA,LA,29.9511,-90.0715,1.3
+Salt Lake City,USA,UT,40.7608,-111.8910,1.2
+Hartford,USA,CT,41.7658,-72.6734,1.2
+Buffalo,USA,NY,42.8864,-78.8784,1.2
+Birmingham,USA,AL,33.5186,-86.8104,1.1
+Rochester,USA,NY,43.1566,-77.6088,1.1
+Grand Rapids,USA,MI,42.9634,-85.6681,1.1
+Tucson,USA,AZ,32.2226,-110.9747,1.0
+Honolulu,USA,HI,21.3069,-157.8583,1.0
+Tulsa,USA,OK,36.1540,-95.9928,1.0
+Fresno,USA,CA,36.7378,-119.7871,1.0
+Omaha,USA,NE,41.2565,-95.9345,0.97
+Albuquerque,USA,NM,35.0844,-106.6504,0.92
+Bakersfield,USA,CA,35.3733,-119.0187,0.91
+Albany,USA,NY,42.6526,-73.7562,0.90
+Knoxville,USA,TN,35.9606,-83.9207,0.87
+Baton Rouge,USA,LA,30.4515,-91.1871,0.87
+New Haven,USA,CT,41.3083,-72.9279,0.86
+Columbia,USA,SC,34.0007,-81.0348,0.84
+Charleston,USA,SC,32.7765,-79.9311,0.81
+Boise,USA,ID,43.6150,-116.2023,0.76
+Little Rock,USA,AR,34.7465,-92.2896,0.75
+Wilmington,USA,DE,39.7391,-75.5398,0.72
+Des Moines,USA,IA,41.5868,-93.6250,0.71
+Madison,USA,WI,43.0731,-89.4012,0.68
+Wichita,USA,KS,37.6872,-97.3301,0.65
+Jackson,USA,MS,32.2988,-90.1848,0.59
+Spokane,USA,WA,47.6588,-117.4260,0.58
+Portland ME,USA,ME,43.6591,-70.2568,0.55
+Reno,USA,NV,39.5296,-119.8138,0.49
+Manchester,USA,NH,42.9956,-71.4548,0.42
+Anchorage,USA,AK,61.2181,-149.9003,0.40
+Sioux Falls,USA,SD,43.5460,-96.7313,0.28
+Fargo,USA,ND,46.8772,-96.7898,0.25
+Charleston WV,USA,WV,38.3498,-81.6326,0.25
+Burlington,USA,VT,44.4759,-73.2121,0.22
+Billings,USA,MT,45.7833,-108.5007,0.18
+Cheyenne,USA,WY,41.1400,-104.8202,0.10

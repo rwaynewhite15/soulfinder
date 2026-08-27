@@ -1,0 +1,55 @@
+# Admin-1 (state / province) covariates used to build the IPF seed matrix.
+# Approximations of publicly reported census-style figures; prototype quality.
+# urban_share, bachelors_share, foreign_born_share are percent of population.
+iso3,admin1_code,admin1_name,geo_id,population_millions,urban_share,median_age,bachelors_share,foreign_born_share
+USA,AL,Alabama,01,5.03,59.0,39.4,26.2,3.5
+USA,AK,Alaska,02,0.73,66.0,34.6,30.1,7.9
+USA,AZ,Arizona,04,7.16,89.8,38.1,30.1,13.4
+USA,AR,Arkansas,05,3.01,56.2,38.3,23.8,4.9
+USA,CA,California,06,39.54,95.0,37.0,35.0,26.6
+USA,CO,Colorado,08,5.77,86.2,37.1,42.7,9.8
+USA,CT,Connecticut,09,3.61,88.0,41.1,39.9,14.9
+USA,DE,Delaware,10,0.99,83.3,41.0,32.9,9.9
+USA,DC,District of Columbia,11,0.69,100.0,34.1,60.0,13.5
+USA,FL,Florida,12,21.54,91.2,42.4,30.5,20.8
+USA,GA,Georgia,13,10.71,75.1,37.0,32.2,10.2
+USA,HI,Hawaii,15,1.46,91.9,39.6,33.6,18.6
+USA,ID,Idaho,16,1.84,70.6,36.9,28.7,5.8
+USA,IL,Illinois,17,12.81,88.5,38.6,35.5,13.9
+USA,IN,Indiana,18,6.79,72.4,38.0,27.8,5.5
+USA,IA,Iowa,19,3.19,64.0,38.5,29.3,5.4
+USA,KS,Kansas,20,2.94,74.2,37.0,34.0,7.2
+USA,KY,Kentucky,21,4.51,58.4,39.1,25.0,4.0
+USA,LA,Louisiana,22,4.66,73.2,37.5,25.0,4.4
+USA,ME,Maine,23,1.36,38.7,45.1,32.9,3.7
+USA,MD,Maryland,24,6.18,87.2,39.0,41.6,15.6
+USA,MA,Massachusetts,25,7.03,92.0,39.6,45.0,17.4
+USA,MI,Michigan,26,10.08,74.6,39.8,30.0,7.0
+USA,MN,Minnesota,27,5.71,73.3,38.4,37.0,8.6
+USA,MS,Mississippi,28,2.96,49.4,37.9,22.8,2.4
+USA,MO,Missouri,29,6.15,70.4,38.9,29.9,4.2
+USA,MT,Montana,30,1.08,55.9,40.1,32.8,2.3
+USA,NE,Nebraska,31,1.96,73.1,36.8,32.4,7.2
+USA,NV,Nevada,32,3.10,94.2,38.1,25.0,18.8
+USA,NH,New Hampshire,33,1.38,60.3,43.1,37.6,6.4
+USA,NJ,New Jersey,34,9.29,94.7,40.0,41.2,23.2
+USA,NM,New Mexico,35,2.12,77.4,38.7,28.1,9.5
+USA,NY,New York,36,20.20,87.9,39.2,38.0,22.6
+USA,NC,North Carolina,37,10.44,66.1,38.9,33.2,8.3
+USA,ND,North Dakota,38,0.78,59.9,35.4,30.1,4.1
+USA,OH,Ohio,39,11.80,77.9,39.6,29.0,4.7
+USA,OK,Oklahoma,40,3.96,66.2,36.9,26.2,6.1
+USA,OR,Oregon,41,4.24,81.0,39.6,35.0,9.8
+USA,PA,Pennsylvania,42,13.00,78.7,40.9,32.3,7.2
+USA,RI,Rhode Island,44,1.10,90.7,40.1,35.0,13.6
+USA,SC,South Carolina,45,5.12,66.3,39.9,29.0,5.2
+USA,SD,South Dakota,46,0.89,56.7,37.4,29.7,3.9
+USA,TN,Tennessee,47,6.91,66.4,38.9,28.0,5.4
+USA,TX,Texas,48,29.15,84.7,35.0,30.7,17.2
+USA,UT,Utah,49,3.27,90.6,31.4,34.7,8.3
+USA,VT,Vermont,50,0.64,38.9,43.2,39.9,4.5
+USA,VA,Virginia,51,8.63,75.5,38.6,40.3,12.6
+USA,WA,Washington,53,7.71,84.1,38.0,37.0,14.6
+USA,WV,West Virginia,54,1.79,48.7,42.9,21.3,1.7
+USA,WI,Wisconsin,55,5.89,70.2,39.9,31.0,5.0
+USA,WY,Wyoming,56,0.58,64.8,38.4,28.7,3.4
