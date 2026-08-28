@@ -152,6 +152,26 @@ story to tell; showing both is not.
 
 ---
 
+## One layout trap worth knowing about
+
+The chart measures its container and renders an `<svg>` at that pixel width.
+That makes the SVG's intrinsic width part of its container's **max-content**
+size — so any grid track sized `auto` or `1fr` (whose floor is `auto`) can never
+shrink below the widest chart it has ever held. The layout ratchets wider,
+never comes back, and the globe drifts off screen.
+
+Every track that holds measured content is therefore `minmax(0, 1fr)`, with
+`min-width: 0` on the panes and `overflow-x: hidden` to clip the one frame
+before the observer re-measures. The atlas has the same hazard in reverse — a
+fixed globe zoom spills across cell boundaries once cells shrink — so its grid
+*and* its zoom are both derived from the measured pane rather than from
+breakpoints.
+
+The rule this leaves behind: **anything whose size is derived from a
+measurement must live in a track that cannot be widened by it.**
+
+---
+
 ## What I would add next
 
 - **Real source data.** The seed tables are hand-compiled approximations. The

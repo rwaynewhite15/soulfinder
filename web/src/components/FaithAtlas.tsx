@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import DeckGL from "@deck.gl/react";
 import { _GlobeView as GlobeView } from "@deck.gl/core";
 import { GeoJsonLayer } from "@deck.gl/layers";
@@ -9,25 +9,64 @@ import { shareOf, yearIndex } from "../lib/data";
 import type { AppData } from "../lib/data";
 import { pct } from "../lib/format";
 
-/** 4x2 on a wide screen, 2x4 when narrow -- eight columns of globe would be
- *  unreadable slivers on a laptop half-screen. */
-function useGrid(): { cols: number; rows: number } {
-  const [narrow, setNarrow] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 1080px)").matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1080px)");
-    const on = () => setNarrow(mq.matches);
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
-  }, []);
-  return narrow ? { cols: 2, rows: 4 } : { cols: 4, rows: 2 };
+/**
+ * Choose the facet grid and the globe zoom from the pane's actual size.
+ *
+ * A fixed 4x2 grid with a fixed zoom only looks right at one window size. Once
+ * the pane narrows the cells shrink but the globes do not, so they spill across
+ * cell boundaries into their neighbours. Both have to follow the measurement:
+ * pick whichever 8-cell arrangement yields the largest globe, then size the
+ * globe to the cell it actually got.
+ */
+function useAtlasLayout(ref: React.RefObject<HTMLDivElement>) {
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => {
+      const w = Math.round(e.contentRect.width);
+      const h = Math.round(e.contentRect.height);
+      setBox((prev) => (Math.abs(prev.w - w) > 1 || Math.abs(prev.h - h) > 1 ? { w, h } : prev));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+
+  return useMemo(() => {
+    const { w, h } = box;
+    if (w < 2 || h < 2) return { cols: 4, rows: 2, zoom: -1 };
+
+    // Each cell keeps room for its label chrome; the globe takes what is left.
+    const globeFor = (cols: number, rows: number) =>
+      Math.min((w / cols) * 0.92, (h / rows) * 0.74);
+
+    // Only the two-dimensional arrangements are candidates. A single row or
+    // column occasionally yields a marginally larger globe on an extreme aspect
+    // ratio, but it is a worse comparison grid and leaves no width for a
+    // facet's name and figures -- which are the point of the panel.
+    const MIN_CELL_W = 150;
+    // 4x2 is the default; 2x4 has to be clearly better to displace it, so the
+    // layout does not flip back and forth while a window is being dragged.
+    const SWITCH_MARGIN = 1.1;
+
+    let best = { cols: 4, rows: 2, d: globeFor(4, 2) };
+    const alt = { cols: 2, rows: 4, d: globeFor(2, 4) };
+    if (w / 2 >= MIN_CELL_W && (alt.d > best.d * SWITCH_MARGIN || w / 4 < MIN_CELL_W)) {
+      best = alt;
+    }
+
+    // deck.gl sizes the world at 512 * 2^zoom pixels across, and an orthographic
+    // globe's visible diameter is that circumference divided by pi.
+    const zoom = Math.log2((Math.max(best.d, 24) * Math.PI) / 512);
+    return { cols: best.cols, rows: best.rows, zoom };
+  }, [box]);
 }
 
 interface ViewState {
   longitude: number; latitude: number; zoom: number; pitch: number; bearing: number;
 }
-const INITIAL: ViewState = { longitude: 20, latitude: 12, zoom: 0.18, pitch: 0, bearing: 0 };
+const INITIAL: ViewState = { longitude: 20, latitude: 12, zoom: -1, pitch: 0, bearing: 0 };
 
 const BACKDROP: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
@@ -64,7 +103,8 @@ const BACKDROP: GeoJSON.FeatureCollection = {
  */
 export default function FaithAtlas({ data }: { data: AppData }) {
   const { year, religion, dark, setReligion, set } = useStore();
-  const { cols: COLS, rows: ROWS } = useGrid();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const { cols: COLS, rows: ROWS, zoom: fitZoom } = useAtlasLayout(stageRef);
   const [viewState, setViewState] = useState<ViewState>(INITIAL);
 
   const years = data.bundle.years;
@@ -156,14 +196,18 @@ export default function FaithAtlas({ data }: { data: AppData }) {
 
   return (
     <div className="atlas">
-      <div className="atlas-stage">
+      <div className="atlas-stage" ref={stageRef}>
       <DeckGL
         views={views as never}
         // one shared camera for all eight facets: deck falls back to a
         // view-less viewState for every view, which is exactly the coupling
         // that makes spinning one globe spin them all
-        viewState={viewState as never}
-        onViewStateChange={({ viewState: vs }) => setViewState(vs as ViewState)}
+        viewState={{ ...viewState, zoom: fitZoom } as never}
+        // Zoom is owned by the layout, not the user: the facets are a
+        // comparison grid, and letting one pan out of its cell breaks it.
+        onViewStateChange={({ viewState: vs }) =>
+          setViewState({ ...(vs as ViewState), zoom: fitZoom })
+        }
         controller={{ dragRotate: false, touchRotate: false }}
         layerFilter={layerFilter as never}
         layers={layers as never}
