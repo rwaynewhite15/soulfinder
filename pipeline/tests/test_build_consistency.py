@@ -12,7 +12,7 @@ import sys
 import numpy as np
 import pytest
 
-from soulfinder.config import RELIGIONS, WEB_DATA, YEARS
+from soulfinder.config import MODERN_FRAMES, RELIGIONS, WEB_DATA, YEARS
 
 
 @pytest.fixture(scope="module")
@@ -59,10 +59,13 @@ def test_states_sum_to_their_country(artifacts):
         st = sum(counts(s, yi) for s in states)
         assert np.allclose(st / st.sum(), nat / nat.sum(), atol=1e-4)
         assert np.isclose(st.sum(), nat.sum(), rtol=ROUNDING_RTOL)
-        # population is serialised as an integer, so it must reconcile exactly
-        assert np.isclose(
-            sum(s["population"][yi] for s in states), by_id["USA"]["population"][yi], rtol=1e-7
-        )
+        # Population is serialised as integers, so summing N children carries up
+        # to N/2 people of rounding. That absolute bound is the right assertion;
+        # a relative one fails on small historical populations, where 1 person
+        # out of 3.9M already exceeds a 1e-7 tolerance.
+        assert abs(
+            sum(s["population"][yi] for s in states) - by_id["USA"]["population"][yi]
+        ) <= len(states)
 
 
 def test_countries_sum_to_the_world(artifacts):
@@ -77,7 +80,7 @@ def test_countries_sum_to_the_world(artifacts):
 
 def test_every_cell_carries_a_provenance_flag(artifacts):
     regions, _ = artifacts
-    allowed = {"observed", "interpolated", "modeled", "synthetic"}
+    allowed = {"observed", "interpolated", "modeled", "synthetic", "historical"}
     for s in regions["series"]:
         assert len(s["provenance"]) == len(YEARS), s["id"]
         assert set(s["provenance"]) <= allowed, s["id"]
@@ -112,8 +115,47 @@ def test_world_rollup_tracks_published_figures(artifacts):
 
 
 def test_population_is_monotone_where_the_source_says_it_grows(artifacts):
+    """Scoped to the modern frames on purpose.
+
+    Over the historical range populations legitimately fall -- plague, and the
+    collapse of the Americas after 1500 -- so monotone growth is the wrong
+    assertion there, not a bug to fix.
+    """
     regions, _ = artifacts
     by_id = {s["id"]: s for s in regions["series"]}
+    start = regions["years"].index(MODERN_FRAMES[0])
     for iso3 in ("NGA", "IND", "USA"):
-        pop = np.array(by_id[iso3]["population"])
+        pop = np.array(by_id[iso3]["population"][start:])
         assert (np.diff(pop) > 0).all(), iso3
+
+
+def test_the_historical_layer_spans_year_zero_to_the_handoff(artifacts):
+    regions, meta = artifacts
+    assert regions["years"][0] == 0
+    handoff = regions["handoffYear"]
+    world = next(s for s in regions["series"] if s["id"] == "WLD")
+    hist = [p for y, p in zip(regions["years"], world["provenance"]) if y < handoff]
+    assert hist and set(hist) == {"historical"}
+    assert meta["counts"]["regions"] == 8
+
+
+def test_religions_are_exactly_zero_before_they_existed(artifacts):
+    """Islam showing 0.06% in year 0 would undercut the whole timelapse."""
+    regions, _ = artifacts
+    founded = {"christian": 30, "muslim": 622}
+    for religion, year in founded.items():
+        j = regions["religions"].index(religion)
+        for s in regions["series"]:
+            for y, row in zip(regions["years"], s["shares"]):
+                if y < year:
+                    assert row[j] == 0.0, f"{s['id']} {religion} at {y}"
+
+
+def test_frame_grid_is_finest_where_the_data_is(artifacts):
+    regions, _ = artifacts
+    years = regions["years"]
+    handoff = regions["handoffYear"]
+    modern = [y for y in years if y >= handoff]
+    assert modern == list(range(handoff, 2051))
+    ancient = [y for y in years if y < 1000]
+    assert all(b - a == 50 for a, b in zip(ancient, ancient[1:]))

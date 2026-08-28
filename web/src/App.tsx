@@ -11,6 +11,7 @@ import Legend from "./components/Legend";
 import { loadAll } from "./lib/data";
 import { colorDomain } from "./lib/domain";
 import { yearIndex } from "./lib/data";
+import { stepFrame } from "./lib/frames";
 import { useStore } from "./state/store";
 import { sequentialRamp } from "./lib/oklch";
 import { categorical } from "./lib/palette";
@@ -49,8 +50,8 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === "SELECT") return;
       const st = useStore.getState();
-      if (e.key === "ArrowRight") st.setYear(Math.min(st.window[1], st.year + 1));
-      else if (e.key === "ArrowLeft") st.setYear(Math.max(st.window[0], st.year - 1));
+      if (e.key === "ArrowRight") st.setYear(stepFrame(st.years, st.year, 1, st.window[0], st.window[1]));
+      else if (e.key === "ArrowLeft") st.setYear(stepFrame(st.years, st.year, -1, st.window[0], st.window[1]));
       else if (e.key === " ") { e.preventDefault(); st.set("playing", !st.playing); }
     };
     window.addEventListener("keydown", onKey);

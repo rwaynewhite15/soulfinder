@@ -1,5 +1,6 @@
-export type Provenance = "observed" | "interpolated" | "modeled" | "synthetic";
-export type Level = "world" | "country" | "admin1";
+export type Provenance =
+  | "observed" | "interpolated" | "modeled" | "synthetic" | "historical";
+export type Level = "world" | "region" | "country" | "admin1";
 
 export interface RegionSeries {
   id: string;
@@ -22,6 +23,8 @@ export interface RegionBundle {
   years: number[];
   religions: string[];
   labels: Record<string, string>;
+  /** first frame of the modern country panel; everything before it is historical */
+  handoffYear: number;
   series: RegionSeries[];
 }
 

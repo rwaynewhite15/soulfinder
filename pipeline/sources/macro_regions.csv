@@ -1,0 +1,59 @@
+# iso3 -> macro-region, for the historical layer.
+# Historical religious composition is estimated for macro-regions, never for
+# modern countries: "France, 800 AD" describes a polity that did not exist in
+# anything like its current borders, and a per-country historical series would
+# dress a regional estimate up as national fact.
+# MENA here is Middle East + North Africa + Central Asia (hence UZB).
+iso3,region
+RUS,EUR
+DEU,EUR
+GBR,EUR
+FRA,EUR
+ITA,EUR
+ESP,EUR
+POL,EUR
+UKR,EUR
+NLD,EUR
+SWE,EUR
+TUR,MENA
+IRN,MENA
+EGY,MENA
+SAU,MENA
+DZA,MENA
+MAR,MENA
+IRQ,MENA
+ISR,MENA
+SDN,MENA
+UZB,MENA
+NGA,SSA
+ETH,SSA
+COD,SSA
+ZAF,SSA
+KEN,SSA
+TZA,SSA
+UGA,SSA
+GHA,SSA
+IND,SAS
+PAK,SAS
+BGD,SAS
+NPL,SAS
+LKA,SAS
+AFG,SAS
+CHN,EAS
+JPN,EAS
+KOR,EAS
+IDN,SEA
+PHL,SEA
+VNM,SEA
+THA,SEA
+MMR,SEA
+MYS,SEA
+USA,AMR
+BRA,AMR
+MEX,AMR
+COL,AMR
+ARG,AMR
+PER,AMR
+VEN,AMR
+CAN,AMR
+AUS,OCE

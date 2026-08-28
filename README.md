@@ -1,7 +1,7 @@
 # Soulfinder
 
-Religious composition of the world, 2010–2050 — an interactive globe, a
-scrubbable time-series chart, and a pipeline that synthesises the subnational
+Religious composition of the world from **year 0 to 2050** — an interactive
+globe, a looping timelapse, and a pipeline that synthesises the subnational
 detail nobody publishes.
 
 ![world view](docs/img/world.png)
@@ -21,6 +21,15 @@ the same view drills into all 51 states.
 region is selected. Drag the playhead to scrub through years; drag the range
 brush to zoom the time axis; the globe follows. World, country and state all
 use the same chart — they are the same data type at different levels.
+
+**A timelapse from antiquity to 2050**, looping. Press play and watch
+Christianity spread from nothing after AD 30, Islam appear after 622 and take
+North Africa and Persia within a century, Buddhism retreat from South Asia, and
+the unaffiliated emerge only in the last hundred years. The frame grid is
+non-uniform on purpose — 50-year steps through antiquity, annual from 2010 —
+because annual frames only exist where annual data does.
+
+![the Islamic expansion, AD 500 to 750](docs/img/historical.png)
 
 **An atlas of all eight faiths at once** — one globe per religion, sharing a
 single camera, so dragging any one of them turns all eight. Each is a
@@ -99,6 +108,28 @@ web/
 ```
 
 ---
+
+## How far back, and how much to trust it
+
+The historical layer runs from year 0 and is **the least certain thing in this
+repository**. Three decisions keep it honest:
+
+- **History is regional, never national.** "France, AD 800" describes a polity
+  that did not exist in its current borders. History is estimated for eight
+  macro-regions; countries inherit their region's trajectory, benchmarked to
+  their own modern level, and every such cell is flagged `historical`.
+- **Religions are exactly zero before they existed.** Log-ratio space cannot
+  represent zero, so structural zeros came back as ~0.06% — enough to render
+  "Muslim 0.1%" in year 0 and quietly deny the thing the timelapse exists to
+  show. Founding years are re-imposed explicitly.
+- **The hierarchy still reconciles.** Benchmarking each series to its own anchor
+  removes the step at the handoff but breaks the promise that states sum to
+  their country and countries to the world. IPF restores it across the
+  historical frames too.
+
+`folk` absorbs every pre-modern ethnic, civic and traditional religion — 74% of
+humanity at year 0. That one bucket is the biggest simplification in the
+dataset. Full detail and limits in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
 ## Why the map never colours countries *by* religion
 

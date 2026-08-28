@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useStore } from "../state/store";
 import { categorical } from "../lib/palette";
+import { formatYear, nextFrameLooping, frameIndex } from "../lib/frames";
 import type { AppData } from "../lib/data";
 
 /**
@@ -11,20 +12,24 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
   const s = useStore();
   const colors = categorical(s.dark);
 
-  // Autoplay walks the year forward and stops at the end of the window rather
-  // than wrapping, so it reads as a timeline rather than a loop.
+  // Autoplay advances one FRAME per tick, not one year: the grid is
+  // non-uniform, so stepping by year would stall for 50 ticks between
+  // antiquity frames and then sprint through the modern era.
   useEffect(() => {
     if (!s.playing) return;
     const t = setInterval(() => {
-      const next = useStore.getState().year + 1;
-      if (next > useStore.getState().window[1]) {
-        useStore.getState().set("playing", false);
-      } else {
-        useStore.getState().setYear(next);
+      const st = useStore.getState();
+      const [lo, hi] = st.window;
+      if (st.loop) {
+        st.setYear(nextFrameLooping(st.years, st.year, lo, hi));
+        return;
       }
-    }, 220);
+      const i = frameIndex(st.years, st.year);
+      if (i >= frameIndex(st.years, hi)) st.set("playing", false);
+      else st.setYear(st.years[i + 1]);
+    }, 200);
     return () => clearInterval(t);
-  }, [s.playing]);
+  }, [s.playing, s.loop]);
 
   return (
     <div className="controls">
@@ -32,14 +37,16 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
         <button
           className="btn primary"
           onClick={() => {
-            if (s.year >= s.window[1]) s.setYear(s.window[0]);
+            // Restarting from the end is only needed when not looping.
+            if (!s.loop && s.year >= s.window[1]) s.setYear(s.window[0]);
             s.set("playing", !s.playing);
           }}
           aria-label={s.playing ? "Pause" : "Play through the years"}
         >
           {s.playing ? "❚❚ Pause" : "▶ Play"}
         </button>
-        <span className="year-readout" aria-live="polite">{s.year}</span>
+        <span className="year-readout" aria-live="polite">{formatYear(s.year)}</span>
+        <Toggle on={s.loop} onChange={(v) => s.set("loop", v)} label="Loop" />
       </div>
 
       <div className="control-group">
@@ -65,6 +72,11 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
           onChange={(e) => s.select(e.target.value)}
         >
           <option value="WLD">World</option>
+          <optgroup label="Macro-regions (carry the historical layer)">
+            {data.macroRegions.map((r) => (
+              <option key={r.id} value={r.id}>{r.name}</option>
+            ))}
+          </optgroup>
           <optgroup label="Countries">
             {data.countries
               .slice()
@@ -110,12 +122,14 @@ export default function Controls({ labels, data }: { labels: string[]; data: App
           <label className="control-label" htmlFor="base">from</label>
           <select
             id="base"
-            className="select narrow"
+            className="select baseline"
             value={s.baseYear}
             onChange={(e) => s.setBaseYear(Number(e.target.value))}
           >
-            {[2010, 2020, 2030, 2040].map((y) => (
-              <option key={y} value={y}>{y}</option>
+            {/* Historical baselines too: comparing AD 0 against 2010 is the
+                least interesting question the map can answer. */}
+            {[0, 500, 1000, 1500, 1800, 1900, 1950, 2010, 2020, 2030, 2040].map((y) => (
+              <option key={y} value={y}>{formatYear(y)}</option>
             ))}
           </select>
         </div>

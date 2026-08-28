@@ -152,6 +152,22 @@ story to tell; showing both is not.
 
 ---
 
+## The frame grid
+
+The app animates over a **non-uniform** year grid spanning 0–2050: 50-year steps
+through antiquity, annual from 2010. This is a data-honesty decision that turns
+into an engineering constraint — `years[i]` is not `years[0] + i`, so anything
+doing index arithmetic on years is wrong. `src/lib/frames.ts` owns the binary
+search, the snapping, and the frame stepping; scrubbing snaps to a frame that
+actually carries data, and playback advances one *frame* per tick rather than
+one year, or it would stall for fifty ticks between antiquity frames and then
+sprint through the modern era.
+
+The chart's x-axis stays linear in years, which compresses 2010–2050 into two
+percent of the width. That is the honest projection, and the range brush already
+existed to zoom into any era — so the default window is the full sweep and the
+brush does the rest.
+
 ## One layout trap worth knowing about
 
 The chart measures its container and renders an `<svg>` at that pixel width.

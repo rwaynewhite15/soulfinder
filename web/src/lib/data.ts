@@ -1,4 +1,5 @@
 import type { DensityPoint, Meta, RegionBundle, RegionSeries } from "./types";
+import { frameIndex } from "./frames";
 
 const base = import.meta.env.BASE_URL ?? "/";
 
@@ -17,6 +18,8 @@ export interface AppData {
   meta: Meta;
   byId: Map<string, RegionSeries>;
   countries: RegionSeries[];
+  /** macro-regions carrying the historical layer */
+  macroRegions: RegionSeries[];
   admin1: RegionSeries[];
   /** admin-1 units keyed by their geometry id, for joining to the GeoJSON */
   admin1ByGeoId: Map<string, RegionSeries>;
@@ -40,6 +43,7 @@ export async function loadAll(): Promise<AppData> {
 
   const byId = new Map(bundle.series.map((s) => [s.id, s]));
   const countries = bundle.series.filter((s) => s.level === "country");
+  const macroRegions = bundle.series.filter((s) => s.level === "region");
   const admin1 = bundle.series.filter((s) => s.level === "admin1");
   const admin1ByGeoId = new Map(
     admin1.filter((s) => s.geo_id).map((s) => [s.geo_id as string, s])
@@ -59,15 +63,20 @@ export async function loadAll(): Promise<AppData> {
   }
 
   return {
-    bundle, meta, byId, countries, admin1, admin1ByGeoId, centroids,
+    bundle, meta, byId, countries, macroRegions, admin1, admin1ByGeoId, centroids,
     countryGeo, stateGeo, densityWorld, densityUsa,
   };
 }
 
-/** Index of a year within the dense per-year arrays. */
+/**
+ * Index of a year within the per-frame arrays.
+ *
+ * The old arithmetic fallback (`year - years[0]`) was correct only while the
+ * grid was one frame per year. It now spans year 0 to 2050 at varying
+ * resolution, so this delegates to a binary search over the real grid.
+ */
 export function yearIndex(years: number[], year: number): number {
-  const i = years.indexOf(year);
-  return i >= 0 ? i : Math.max(0, Math.min(years.length - 1, year - years[0]));
+  return frameIndex(years, year);
 }
 
 export function shareOf(s: RegionSeries, yi: number, ri: number): number {

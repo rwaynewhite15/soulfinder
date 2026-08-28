@@ -25,6 +25,7 @@ export const PROVENANCE_LABEL: Record<string, string> = {
   interpolated: "Interpolated",
   modeled: "Modeled",
   synthetic: "Synthetic",
+  historical: "Historical estimate",
 };
 
 export const PROVENANCE_NOTE: Record<string, string> = {
@@ -32,4 +33,6 @@ export const PROVENANCE_NOTE: Record<string, string> = {
   interpolated: "Between two reported years, interpolated along the source trend.",
   modeled: "Reported for this unit in one year, carried across years by the national trend.",
   synthetic: "No subnational survey for this unit. Estimated from covariates, then raked to the national total.",
+  historical:
+    "Pre-modern reconstruction. Estimated for a macro-region from fragmentary evidence, then mapped onto modern borders that did not exist at the time. Read it as a rough shape, never as a measurement.",
 };

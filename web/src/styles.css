@@ -478,3 +478,14 @@ body {
 @media (max-width: 1200px) {
   .rail-head, .rail-row { grid-template-columns: 150px 110px 64px 64px 70px 96px 74px; gap: 8px; }
 }
+
+/* historical provenance: the weakest claim in the dataset, and marked as such */
+:root { --prov-historical: #8d6bd6; }
+:root[data-theme="dark"] { --prov-historical: #a78bea; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --prov-historical: #a78bea; }
+}
+.prov-historical { background: var(--prov-historical); }
+.prov-card.prov-historical { border-left-color: var(--prov-historical); }
+.tip-historical { color: #a78bea; }
+.select.baseline { width: 104px; }
