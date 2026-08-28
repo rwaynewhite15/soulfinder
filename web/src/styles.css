@@ -76,8 +76,18 @@ body {
 
 .app {
   display: grid;
+  /* minmax(0, 1fr), never a bare `auto` or `1fr`.
+     Both of those floor the track at its content's max-content width, and this
+     app puts a hard-pixel-width <svg> inside: the chart measures its container,
+     renders an SVG that wide, and the SVG then becomes the floor the container
+     can never shrink below. The layout ratchets wider and never comes back,
+     pushing the globe off screen. A zero floor makes the track viewport-driven,
+     so oversized content overflows (and is clipped) instead of widening it. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto minmax(320px, 1fr) auto;
   height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
   gap: 1px;
   background: var(--border);
 }
@@ -158,8 +168,13 @@ body {
 .toggle.on { color: var(--text-primary); }
 
 /* ---------- stage ---------- */
-.stage { display: grid; grid-template-columns: 1fr 340px; gap: 1px; min-height: 0; }
-.map-pane { position: relative; background: var(--surface-1); overflow: hidden; }
+/* Same zero floor here: the map column must follow the viewport, not the
+   widest thing that has ever been rendered into the pane. */
+.stage {
+  display: grid; grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1px; min-height: 0; min-width: 0;
+}
+.map-pane { position: relative; min-width: 0; background: var(--surface-1); overflow: hidden; }
 .map-hint {
   position: absolute; left: 12px; bottom: 10px; z-index: 2;
   font-size: 11px; color: var(--text-secondary);
@@ -182,7 +197,7 @@ body {
 }
 
 /* ---------- side panel ---------- */
-.panel { background: var(--surface-1); padding: 14px 16px; overflow-y: auto; }
+.panel { background: var(--surface-1); padding: 14px 16px; min-width: 0; overflow-y: auto; }
 .crumbs { display: flex; align-items: center; gap: 6px; font-size: 11.5px; margin-bottom: 6px; }
 .crumb {
   border: 0; background: none; padding: 0; cursor: pointer;
@@ -262,8 +277,12 @@ body {
   display: flex; flex-direction: column; min-height: 0;
   /* cap the lower pane so a tall trends rail cannot starve the map */
   max-height: 46vh;
+  /* min-width lets the flex item shrink; overflow-x clips a chart SVG that is
+     momentarily wider than its pane, during the frame before the observer
+     re-measures, rather than letting it push the page wider. */
+  min-width: 0; overflow-x: hidden;
 }
-.chart-body { flex: 1; min-height: 0; overflow-y: auto; }
+.chart-body { flex: 1; min-height: 0; min-width: 0; overflow-y: auto; }
 .chart-head { display: flex; align-items: baseline; justify-content: space-between; }
 .chart-head h2 {
   margin: 0 0 2px; font-size: 13px; font-weight: 600;
@@ -349,7 +368,7 @@ body {
 }
 
 @media (max-width: 900px) {
-  .stage { grid-template-columns: 1fr; grid-template-rows: minmax(280px, 1fr) auto; }
+  .stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(280px, 1fr) auto; }
   .app { height: auto; min-height: 100vh; }
 }
 
@@ -374,7 +393,8 @@ body {
   display: flex; flex-direction: column;
 }
 /* the note gets its own strip: overlaying it on the grid covered two facets */
-.atlas-stage { position: relative; flex: 1; min-height: 0; }
+/* a floor so the facets stay legible; below it the page scrolls vertically */
+.atlas-stage { position: relative; flex: 1; min-height: 260px; }
 /* This grid is an overlay sitting on top of the WebGL canvas, so it and its
    cells must stay transparent -- a background here paints over the globes.
    Separators are inset shadows on each facet, which also survive the column
@@ -424,7 +444,9 @@ body {
 .atlas-caveat { color: var(--text-muted); }
 
 /* ---------- trend rail ---------- */
-.rail { padding-top: 2px; }
+/* The rail's columns are fixed widths totalling ~800px. Below that it scrolls
+   inside its own container -- wide content never makes the page scroll. */
+.rail { padding-top: 2px; overflow-x: auto; }
 .rail-head, .rail-row {
   display: grid;
   grid-template-columns: 168px 132px 72px 72px 78px 118px 84px;

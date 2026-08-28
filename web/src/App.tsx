@@ -28,7 +28,14 @@ export default function App() {
   useLayoutEffect(() => {
     const el = chartRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setChartWidth(entry.contentRect.width));
+    const ro = new ResizeObserver(([entry]) => {
+      // Round and ignore sub-pixel churn. The observed element's width feeds an
+      // SVG rendered back into it, so a jittering measurement is a feedback
+      // loop; a floor keeps the chart's inner width positive when the pane is
+      // briefly tiny (during a theme swap or view switch).
+      const next = Math.max(320, Math.round(entry.contentRect.width));
+      setChartWidth((prev) => (Math.abs(prev - next) > 1 ? next : prev));
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, [data]);
