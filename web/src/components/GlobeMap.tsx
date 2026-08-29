@@ -9,6 +9,7 @@ import { rampAt, sequentialRamp } from "../lib/oklch";
 import { change, peopleOf, shareOf, yearIndex } from "../lib/data";
 import { colorDomain } from "../lib/domain";
 import { pct, people, pp, signedPeople } from "../lib/format";
+import { formatYear } from "../lib/frames";
 import type { AppData, } from "../lib/data";
 import type { RegionSeries } from "../lib/types";
 
@@ -273,8 +274,8 @@ export default function GlobeMap({ data }: Props) {
         html: `<div class="map-tip">
                  <b>${s.name}</b>
                  <div class="tip-row"><span>${label}</span><span>${pct(share)}</span></div>
-                 <div class="tip-row"><span>vs ${baseYear}</span><span>${delta}</span></div>
-                 <div class="tip-row"><span>Population ${year}</span><span>${people(s.population[yi] ?? 0)}</span></div>
+                 <div class="tip-row"><span>vs ${formatYear(baseYear)}</span><span>${delta}</span></div>
+                 <div class="tip-row"><span>Population ${formatYear(year)}</span><span>${people(s.population[yi] ?? 0)}</span></div>
                  <div class="tip-prov tip-${s.provenance[yi]}">${s.provenance[yi]}</div>
                </div>`,
       };

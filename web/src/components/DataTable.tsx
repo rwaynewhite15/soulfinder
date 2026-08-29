@@ -2,6 +2,7 @@ import { useStore } from "../state/store";
 import { categorical } from "../lib/palette";
 import { pct, people, pp, signedPeople } from "../lib/format";
 import { change, peopleOf, shareOf, yearIndex } from "../lib/data";
+import { formatYear } from "../lib/frames";
 import type { RegionSeries } from "../lib/types";
 
 /**
@@ -26,7 +27,7 @@ export default function DataTable({
     <div className="table-wrap">
       <table className="data-table">
         <caption>
-          {series.name} — {year} (baseline {baseYear}).
+          {series.name} — {formatYear(year)} (baseline {formatYear(baseYear)}).
           Provenance: <span className={`prov prov-${series.provenance[yi]}`}>{series.provenance[yi]}</span>
           {series.lo && <span className="caption-note"> · “—” means measured, not modeled: no interval applies.</span>}
         </caption>

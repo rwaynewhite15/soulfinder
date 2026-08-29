@@ -4,9 +4,11 @@ import { area, stack, stackOrderNone, stackOffsetNone, curveMonotoneX } from "d3
 import { useStore } from "../state/store";
 import { categorical } from "../lib/palette";
 import type { RegionSeries } from "../lib/types";
+import { formatYearShort, snapToFrame } from "../lib/frames";
 
 const M = { top: 4, right: 128, bottom: 16, left: 52 };
-const MIN_SPAN = 4;
+// Wide enough to always leave at least two frames inside the window.
+const MIN_SPAN = 100;
 
 /**
  * Focus-and-context strip under the main chart.
@@ -59,7 +61,7 @@ export default function RangeBrush({
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return years[0];
     const px = clientX - rect.left - M.left;
-    return Math.round(x.invert(Math.max(0, Math.min(iw, px))));
+    return snapToFrame(years, x.invert(Math.max(0, Math.min(iw, px))));
   };
 
   const onMove = (clientX: number) => {
@@ -151,8 +153,8 @@ export default function RangeBrush({
           <circle cy={-M.top + 3} r={3.5} className="brush-playhead-dot" />
         </g>
 
-        <text x={x(win[0])} y={ih + 12} className="tick" textAnchor="start">{win[0]}</text>
-        <text x={x(win[1])} y={ih + 12} className="tick" textAnchor="end">{win[1]}</text>
+        <text x={x(win[0])} y={ih + 12} className="tick" textAnchor="start">{formatYearShort(win[0])}</text>
+        <text x={x(win[1])} y={ih + 12} className="tick" textAnchor="end">{formatYearShort(win[1])}</text>
       </g>
     </svg>
   );

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { AppData } from "../lib/data";
+import { snapToFrame } from "../lib/frames";
 
 export type MapMetric = "share" | "change";
 export type ChangeBasis = "share" | "people";
@@ -10,6 +11,8 @@ export type ChartView = "series" | "trends";
 export interface AppState {
   data: AppData | null;
   error: string | null;
+  /** the frame grid, mirrored here so setYear can snap without the caller helping */
+  years: number[];
 
   /** Currently scrubbed year. */
   year: number;
@@ -39,6 +42,8 @@ export interface AppState {
   showTable: boolean;
   dark: boolean;
   playing: boolean;
+  /** wrap the timelapse back to the window start instead of stopping */
+  loop: boolean;
 
   setData: (d: AppData) => void;
   setError: (e: string) => void;
@@ -59,9 +64,11 @@ const N_RELIGIONS = 8;
 export const useStore = create<AppState>((set) => ({
   data: null,
   error: null,
+  years: [],
   year: 2025,
   baseYear: 2010,
-  window: [2010, 2050],
+  // Opens on the full sweep, year 0 to 2050. The range brush zooms to any era.
+  window: [0, 2050],
   religion: 0,
   visible: Array(N_RELIGIONS).fill(true),
   selected: "WLD",
@@ -76,10 +83,13 @@ export const useStore = create<AppState>((set) => ({
   dark: typeof window !== "undefined"
     && window.matchMedia?.("(prefers-color-scheme: dark)").matches,
   playing: false,
+  loop: true,
 
-  setData: (d) => set({ data: d }),
+  setData: (d) => set({ data: d, years: d.bundle.years }),
   setError: (e) => set({ error: e }),
-  setYear: (y) => set({ year: y }),
+  // Snap to a frame that actually carries data: the grid is non-uniform, so an
+  // arbitrary year between knots has nothing to render.
+  setYear: (y) => set((s) => ({ year: s.years.length ? snapToFrame(s.years, y) : y })),
   setBaseYear: (y) => set({ baseYear: y }),
   setWindow: (w) => set({ window: w }),
   setReligion: (i) => set({ religion: i }),

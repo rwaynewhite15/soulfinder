@@ -212,7 +212,65 @@ Two further checks run on every build and fail it if violated:
 
 ---
 
-## 7. Provenance
+## 7. The historical layer, year 0 to the handoff
+
+The modern panel starts in 2010. Everything before it is a different kind of
+claim, and the pipeline treats it as one.
+
+**History is regional, never national.** "France, AD 800" describes a polity
+that did not exist in anything like its current borders. So the historical layer
+is estimated for **eight macro-regions**, and countries inherit their region's
+trajectory. What the app shows for a country before 2010 is a *mapping onto
+modern borders*, flagged `historical` and labelled as such wherever it surfaces.
+
+**The frame grid is deliberately non-uniform.** Annual frames exist only where
+annual data does: 50-year steps through 0–1000, then 100, 50, 25, 10, and
+finally annual from 2010. A year-by-year claim about AD 400 would be fiction
+dressed as precision, and it would inflate the payload twentyfold to carry no
+extra information. Resolution is finest through 0–1000 because that is where
+the two largest shifts in the whole series happen.
+
+**Four joins, all made with machinery already in the repo:**
+
+| Problem | Fix |
+|---|---|
+| Historical and modern tables disagree at the handoff | Benchmark the historical series onto the modern anchor (§3) |
+| Countries inherit a regional *level* they don't share — the US stepped 13pp, India 16pp | Benchmark each country onto its own modern composition, so the region supplies shape and the country supplies level |
+| Independently levelled children no longer sum to their parent | Rake them with IPF (§4), restoring the hierarchy exactly |
+| Log-ratio space cannot represent zero, so Islam showed 0.06% in year 0 | Re-impose exact zeros before a religion's founding year, then re-close |
+
+That last one matters more than its size suggests. The point of the timelapse is
+watching Islam appear after 622 and Christianity spread from AD 30; a residual
+epsilon rendering as "0.1%" in year 0 would quietly deny it.
+
+**The bridge row.** The historical table's 2010 row is *generated*, not authored
+— it is set equal to the modern country rollup. It has to be, because the
+historical series is benchmarked onto it: when an authored value drifts, the
+disagreement propagates backwards across two millennia. An authored MENA Jewish
+share 2.2 points too high at 2010 halved the Jewish share of the world in year
+0. `python -m soulfinder.bridge` regenerates it.
+
+There is deliberately **no 2000 row**: an authored knot ten years before a
+derived one over-specifies the last decade, and produced a 24-point step in
+Ghana at the handoff. The last authored knot is 1950.
+
+### How much to trust it
+
+Much less than anything else here. Pre-modern religious demography is
+reconstructed from fragmentary evidence, and scholarly estimates for the same
+region and century differ by tens of percentage points. The seed table follows
+the broad contours reported in the World Christian Encyclopedia tradition — the
+timing of Christianisation, the expansion after 622, the retreat of Buddhism
+from South Asia — but the precise numbers are illustrative, not citable.
+
+One further simplification is worth naming: **`folk` absorbs every pre-modern
+ethnic, civic and traditional religion** — Greco-Roman and Norse polytheism,
+Chinese folk religion, and the indigenous traditions of Africa, the Americas and
+Oceania. At year 0 that single bucket is 74% of humanity. It is doing an
+enormous amount of work, and flattening that much genuine diversity into one
+category is the biggest distortion in the historical layer.
+
+## 8. Provenance
 
 Every cell carries one of four flags, and the UI is required to distinguish
 them:
@@ -223,6 +281,7 @@ them:
 | `interpolated` | Between two reported years, along the source trend. |
 | `modeled` | Reported for this unit in one year, carried across years by the national trend. |
 | `synthetic` | No subnational survey. Estimated from covariates, then raked to the national total. |
+| `historical` | Pre-modern regional reconstruction, mapped onto modern borders. The weakest claim here by a wide margin. |
 
 Modelled and synthetic cells additionally carry a 5–95% credible interval,
 sampled in ALR space and inverted per draw — propagating a symmetric interval
@@ -245,3 +304,6 @@ than a degenerate range, which would manufacture a precision claim nobody made.
 - **The rural density floor is a constant**, not an estimated urban/rural
   differential per religion, which is a real and measurable effect.
 - **Only the US has an admin-1 layer.** Every other country stops at national.
+- **The historical layer has no validation set.** The modern synthesis is
+  cross-validated against held-out US states; nothing comparable exists for
+  antiquity, so its error is unmeasured rather than small.

@@ -3,6 +3,7 @@ import { useStore } from "../state/store";
 import { categorical } from "../lib/palette";
 import { PROVENANCE_LABEL, PROVENANCE_NOTE, pct, people, pp, signedPeople } from "../lib/format";
 import { change, peopleOf, shareOf, yearIndex } from "../lib/data";
+import { formatYear } from "../lib/frames";
 import type { AppData } from "../lib/data";
 
 export default function RegionPanel({ data }: { data: AppData }) {
@@ -58,7 +59,7 @@ export default function RegionPanel({ data }: { data: AppData }) {
       <h2 className="panel-title">{series.name}</h2>
       <div className="hero">
         <div className="hero-value">{people(series.population[yi] ?? 0)}</div>
-        <div className="hero-label">people, {year}</div>
+        <div className="hero-label">people, {formatYear(year)}</div>
       </div>
 
       <div className="stat-row">
@@ -71,7 +72,7 @@ export default function RegionPanel({ data }: { data: AppData }) {
           {interval && <div className="stat-sub">90% interval {interval}</div>}
         </div>
         <div className="stat">
-          <div className="stat-label">Change from {baseYear}</div>
+          <div className="stat-label">Change from {formatYear(baseYear)}</div>
           <div className={`stat-value ${d >= 0 ? "up" : "down"}`}>
             {changeBasis === "share" ? pp(d) : signedPeople(d)}
           </div>
@@ -81,7 +82,7 @@ export default function RegionPanel({ data }: { data: AppData }) {
         </div>
       </div>
 
-      <h3 className="section-head">Composition, {year}</h3>
+      <h3 className="section-head">Composition, {formatYear(year)}</h3>
       <ul className="bars">
         {ranked.map(({ ri, share, n }) => (
           <li key={ri}>

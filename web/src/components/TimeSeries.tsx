@@ -4,6 +4,7 @@ import { area, line, stack, stackOrderNone, stackOffsetNone, curveMonotoneX } fr
 import { useStore } from "../state/store";
 import { categorical } from "../lib/palette";
 import { pct, people } from "../lib/format";
+import { formatYear, formatYearShort, snapToFrame } from "../lib/frames";
 import type { RegionSeries } from "../lib/types";
 
 const M = { top: 16, right: 128, bottom: 30, left: 52 };
@@ -101,7 +102,8 @@ export default function TimeSeries({ series, years, labels, width, height }: Pro
     if (!rect) return year;
     const px = clientX - rect.left - M.left;
     const raw = x.invert(Math.max(0, Math.min(iw, px)));
-    return Math.max(win[0], Math.min(win[1], Math.round(raw)));
+    // Snap to a real frame: between antiquity knots there is nothing to show.
+    return snapToFrame(years, Math.max(win[0], Math.min(win[1], raw)));
   };
 
   const activeYear = hoverYear ?? year;
@@ -174,7 +176,7 @@ export default function TimeSeries({ series, years, labels, width, height }: Pro
         ))}
 
         {x.ticks(Math.min(9, Math.max(2, Math.round(iw / 70)))).map((t) => (
-          <text key={t} x={x(t)} y={ih + 20} textAnchor="middle" className="tick">{t}</text>
+          <text key={t} x={x(t)} y={ih + 20} textAnchor="middle" className="tick">{formatYearShort(t)}</text>
         ))}
 
         {chartMode === "stack" && stacked
@@ -282,7 +284,7 @@ function Tooltip({
     <foreignObject x={left} y={top} width={w} height={h} pointerEvents="none">
       <div className="tooltip">
         <div className="tooltip-head">
-          {year} · {people(pop)} people
+          {formatYear(year)} · {people(pop)} people
         </div>
         {rows.map((r) => (
           <div className="tooltip-row" key={r.ri}>

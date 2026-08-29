@@ -21,7 +21,7 @@ import pandas as pd
 from scipy.interpolate import PchipInterpolator
 
 from .compositional import alr, alr_inv
-from .config import RELIGIONS, YEARS
+from .config import MODERN_FRAMES, RELIGIONS
 
 
 def interpolate_series(knot_years: np.ndarray, knot_comps: np.ndarray, targets: np.ndarray) -> np.ndarray:
@@ -73,13 +73,19 @@ def interpolate_population(knot_years, knot_pop, targets) -> np.ndarray:
 
 
 def densify_national(
-    national: pd.DataFrame, population: pd.DataFrame, years: list[int] = YEARS
+    national: pd.DataFrame, population: pd.DataFrame, years: list[int] | None = None
 ) -> pd.DataFrame:
     """Expand ragged decadal knots into a dense (iso3 x year) panel.
 
     Each row is tagged `observed` when that year is a source knot and
     `interpolated` otherwise, so the UI can tell the two apart.
+
+    Defaults to the modern frames only: the country sources begin at the
+    handoff year, and interpolating them across antiquity would clamp every
+    ancient frame to the 2010 value -- a flat line asserting that Rome looked
+    like the modern world.
     """
+    years = MODERN_FRAMES if years is None else years
     years_arr = np.asarray(years, dtype=float)
     frames = []
     pop_by_iso = {k: v for k, v in population.groupby("iso3")}
